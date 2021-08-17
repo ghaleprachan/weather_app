@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:weather_app/services/weather.dart';
 import 'package:weather_app/utilities/constants.dart';
 
+import 'city_screen.dart';
+
 class LocationScreen extends StatefulWidget {
   final locationWeather;
 
@@ -26,6 +28,13 @@ class _LocationScreenState extends State<LocationScreen> {
 
   void updateUi(dynamic weatherData) {
     setState(() {
+      if (weatherData == null) {
+        temprature = 0;
+        weatherIcon = 'Error';
+        message = 'Unable to get weather data';
+        cityname = '';
+        return;
+      }
       double? temp = weatherData['main']['temp'];
       temprature = (temp ?? 0.0).toInt();
       var condition = weatherData['weather'][0]['id'];
@@ -42,7 +51,7 @@ class _LocationScreenState extends State<LocationScreen> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('images/location_background.jpg'),
+            image: const AssetImage('images/location_background.jpg'),
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
                 Colors.white.withOpacity(0.8), BlendMode.dstATop),
@@ -58,14 +67,30 @@ class _LocationScreenState extends State<LocationScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      // We need to to await because we should  not go to updateUI until api is called
+                      // And weatherData is not null
+                      var weatherData = await weather.getLocationWeather();
+                      updateUi(weatherData);
+                    },
                     child: const Icon(
                       Icons.near_me,
                       size: 50.0,
                     ),
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      // This is data received from city screen using pop.
+                      var typedName = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) {
+                            return const CityScreen();
+                          },
+                        ),
+                      );
+                      print("THIS IS ME $typedName");
+                    },
                     child: const Icon(
                       Icons.location_city,
                       size: 50.0,
