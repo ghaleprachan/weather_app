@@ -89,7 +89,11 @@ class _LocationScreenState extends State<LocationScreen> {
                           },
                         ),
                       );
-                      print("THIS IS ME $typedName");
+                      if (typedName != null) {
+                        var weatherData = weather.cityWeather(typedName);
+                        print('reached here');
+                        updateUi(weatherData);
+                      }
                     },
                     child: const Icon(
                       Icons.location_city,
